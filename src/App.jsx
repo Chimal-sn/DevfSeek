@@ -1,12 +1,18 @@
 import { useState } from "react";
 import { SendHorizontal } from "lucide-react";
 
-export default function App() {
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
+import { useForm } from "react-hook-form";
 
-  const sendMessage = () => {
-    console.log("Sending message:", input);
+export default function App() {
+
+  const { register, handleSubmit, reset } = useForm();
+
+  const [messages, setMessages] = useState([]);
+
+  const onSubmit = (data) => {
+
+    setMessages([...messages, { text: data.message, sender: "user" }]);
+    reset();
   };
 
   return (
@@ -15,31 +21,28 @@ export default function App() {
         {messages.map((msg, index) => (
           <div
             key={index}
-            className={`max-w-xs px-4 py-2 rounded-lg ${
-              msg.sender === "user"
-                ? "bg-blue-600 self-end"
-                : "bg-gray-700 self-start"
-            }`}
+            className={`max-w-xs px-4 py-2 rounded-lg ${msg.sender === "user"
+              ? "bg-blue-600 self-end"
+              : "bg-gray-700 self-start"
+              }`}
           >
             {msg.text}
           </div>
         ))}
       </div>
-      <div className="p-4 flex items-center bg-gray-800">
+      <form onSubmit={handleSubmit(onSubmit)} className="p-4 flex items-center bg-gray-800">
         <input
           type="text"
           className="flex-1 p-2 rounded-lg bg-gray-700 border border-gray-600 text-white focus:outline-none"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+          {...register("message", { required: true })}
         />
         <button
           className="ml-2 p-2 bg-blue-600 rounded-lg"
-          onClick={sendMessage}
+
         >
           <SendHorizontal size={20} />
         </button>
-      </div>
-    </div>
+      </form>
+    </div >
   );
 }
